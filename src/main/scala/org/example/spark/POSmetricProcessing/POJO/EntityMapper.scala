@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 object EntityMapper {
 
-  case class Consumer(@JsonProperty("CON_ID") CON_ID:Int,
+  /*case class Consumer(@JsonProperty("CON_ID") CON_ID:Int,
                       @JsonProperty("NAME") NAME:String,
                       @JsonProperty("GENDER") GENDER:String,
                       @JsonProperty("PHONE") PHONE:String,
@@ -13,7 +13,7 @@ object EntityMapper {
   case class ConsumerAddress(@JsonProperty("CON_ID") CON_ID:Int,
                              @JsonProperty("ADDR_LINE") ADDR_LINE:String,
                              @JsonProperty("PIN") PIN:Int,
-                             @JsonProperty("STATE") STATE:String)
+                             @JsonProperty("STATE") STATE:String)*/
 
   case class ConsumerInvoiceDetail(@JsonProperty("CON_ID") CON_ID:Int,
                                    @JsonProperty("NAME") NAME:String,
@@ -50,24 +50,5 @@ object EntityMapper {
                      @JsonProperty("Merchant_Detail") merchant:Merchant,
                      @JsonProperty("Location_Detail") location:Location,
                      @JsonProperty("Billing_Detail") productPurchased:Product_Purchased)
-
-  case class SinkConsumerDetail(@JsonProperty("Invoice_Number") invoiceNum:Int,
-                                @JsonProperty("Consumer_Detail") consumerDetails:ConsumerInvoiceDetail)
-
-  case class SinkMerchantDetail(@JsonProperty("Invoice_Number") invoiceNum:Int,
-                                @JsonProperty("Merchant_Detail") merchant:Merchant,
-                                @JsonProperty("Location_Detail") location:Location)
-
-  case class SinkBillingDetail( @JsonProperty("Invoice_Number") invoiceNum:Int,
-                                @JsonProperty("MRCH_CD") MRCH_CD:Int,
-                                @JsonProperty("MRCH_CAT_CD") MRCH_CAT_CD:Int,
-                                @JsonProperty("MRCH_NM") MRCH_NM:String,
-                                @JsonProperty("BILL_AMT") BILL_AMT:Double)
-
-  case class SinkPurchasedProduct( @JsonProperty("Invoice_Number") invoiceNum:Int,
-                                    @JsonProperty("PRD_LIST") PRD_LIST:List[Product_Cart])
-
-
-
 
 }

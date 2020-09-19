@@ -8,10 +8,11 @@ import org.apache.hadoop.hbase.client.{Admin, Connection, ConnectionFactory, Get
 import org.apache.hadoop.hbase.util._
 import java.util.Properties
 
-
+import org.example.spark.POSmetricProcessing.hbaseUtils
 
 import collection.JavaConverters._
 import scala.collection.mutable
+import scala.util.Try
 
 object hbaseOps {
 
@@ -25,9 +26,11 @@ object hbaseOps {
 
 
   def loadcolMapping() = {
-
     if (tblCFmapping.isEmpty) {
-      scala.io.Source.fromInputStream(getClass.getResourceAsStream("/tblColFamily.cfg")).getLines().foreach(line => tblCFmapping += (line.split("=")(0) -> line.split("=")(1)))
+      scala.io.Source.fromInputStream(getClass.getResourceAsStream("/tblColFamily.cfg")).getLines().map(line => line.split(":")(1)).foreach(line => {
+        println(line);
+        tblCFmapping += (line.split("=")(0) -> line.split("=")(1))
+      })
     }
   }
 
@@ -36,6 +39,7 @@ object hbaseOps {
         {
           val hdpConf = new Configuration()
           hbaseConfiguration = HBaseConfiguration.create(new Configuration())
+          //hbaseConfiguration.addResource("file://quickstart.cloudera/etc/hbase/conf/hbase-site.xml")
           val iStream: InputStream = getClass.getResourceAsStream("/HbaseConfig.cfg")
           scala.io.Source.fromInputStream(iStream).getLines().foreach(line=>hbaseConfiguration.set(line.split("=")(0),line.split("=")(1)))
           conn = ConnectionFactory.createConnection(hbaseConfiguration)
@@ -51,23 +55,28 @@ object hbaseOps {
 
     if(!admin.tableExists(tbl))
       {
-        loadcolMapping()
-
+        hbaseOps.loadcolMapping()
         cfList = tblCFmapping.get(tblNm) match {
           case Some(x) => x.split(",").toList
           case None => Nil
         }
-      }
-
-        cfList.foreach(println)
         val tblDesc = new HTableDescriptor(tblNm)
         cfList.foreach(cf=>tblDesc.addFamily(new HColumnDescriptor(cf)))
         admin.createTable(tblDesc)
-        println("Table Created!!")
+      }
 
     true
   }
 
+  def chkTbl(tblNm:String) = {
+
+    Try(if (hbaseUtils.hbaseOps.getConfig)
+          if (hbaseUtils.hbaseOps.getOrCreateTbl(tblNm))
+            {
+              println(s"CHECK FOR TABLE ${tblNm} SUCCESSFUL")
+            }).isSuccess
+
+  }
 
   def insUpdRec(tblNm:String,hbaseOffset:List[(String,String)]= Nil) = {
 
@@ -89,22 +98,38 @@ object hbaseOps {
 
   }
 
-  def fetchRecs(tblNm:String="HBASE_OFFSET_TBL",hbaseOffset:List[(String,String)]= Nil) = {
+  def fetchOffsets(offsetParam:Map[String,String]) = {
 
-    loadcolMapping()
-
-    cfList = tblCFmapping.get(tblNm) match {
-      case Some(x) => x.split(",").toList
-      case None => Nil
+    val tblNm:String="POS_HBASE_OFFSET_TBL"
+    var tbl: HTable = null
+    val cf: String = offsetParam.get("subscribe") match
+    { case Some(x) => x}
+    val parts: Int = offsetParam.get("partitions") match
+    {
+      case Some(x) => x.toInt - 1
     }
 
-    cfList.foreach(elem => {
-      val get:Get = new Get(Bytes.toBytes("invoice"))
-      get.addFamily(Bytes.toBytes("invoice_0".split("_")(0)))
-    })
+
+    if(chkTbl(tblNm)) tbl = new HTable(hbaseConfiguration, tblNm) else println("Error")
+
+    val tblFetchOffset: List[(Int, String)] = (0 to parts).map(part=> {
+      val offset: String = Bytes.toString(tbl.get(new Get(Bytes.toBytes(cf + "_" + part.toString))).getValue(Bytes.toBytes(cf),Bytes.toBytes(part.toString)))
+      (part, if(offset == null) (-2).toString else offset)
+    }).toList
 
 
+    (cf,tblFetchOffset)
 
+  }
+
+  def parseOffset(offsetParam:Map[String,String]) = {
+
+    val (cf:String,tblFetchOffset:List[(Int,String)]) = fetchOffsets(offsetParam)
+    val tmpOffsetStr = "{\"" + cf + "\":{" + tblFetchOffset.map(x=> "\"" + x._1 + "\":" + (x._2.toLong + 1).toString  + ",").mkString + "}}"
+
+    val offsetStr = tmpOffsetStr.patch(tmpOffsetStr.lastIndexOf(","),"",1)
+    println(offsetStr)
+    offsetStr
   }
 
 
