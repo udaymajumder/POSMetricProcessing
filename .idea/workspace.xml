@@ -4,7 +4,19 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7f8b3131-5b0d-4b71-9b51-92e4aaa7539f" name="Default Changelist" comment="" />
+    <list default="true" id="7f8b3131-5b0d-4b71-9b51-92e4aaa7539f" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/scala/org/example/spark/POSmetricProcessing/sparkUdfUtils/MerchantBillingAggregator.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/org/example/spark/POSmetricProcessing/sparkUdfUtils/SparkUdfObject.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/SparkKafkaConfig.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/SparkKafkaConfig.cfg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/org/example/spark/POSmetricProcessing/MetricProcessMain.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/org/example/spark/POSmetricProcessing/MetricProcessMain.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/org/example/spark/POSmetricProcessing/POJO/EntityMapper.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/org/example/spark/POSmetricProcessing/POJO/EntityMapper.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SparkKafkaConfig.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/SparkKafkaConfig.cfg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/spark/POSmetricProcessing/MetricProcessMain$$anonfun$main$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/spark/POSmetricProcessing/MetricProcessMain$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/spark/POSmetricProcessing/MetricProcessMain$.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/spark/POSmetricProcessing/POJO/EntityMapper$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/spark/POSmetricProcessing/POJO/EntityMapper$.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/spark/POSmetricProcessing/POJO/EntityMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/spark/POSmetricProcessing/POJO/EntityMapper.class" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

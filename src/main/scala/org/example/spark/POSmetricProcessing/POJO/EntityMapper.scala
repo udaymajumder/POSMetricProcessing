@@ -51,4 +51,20 @@ object EntityMapper {
                      @JsonProperty("Location_Detail") location:Location,
                      @JsonProperty("Billing_Detail") productPurchased:Product_Purchased)
 
+  case class SinkConsumerDetail(@JsonProperty("Invoice_Number") invoiceNum:Int,
+                                @JsonProperty("Consumer_Detail") consumerDetails:ConsumerInvoiceDetail)
+
+  case class SinkMerchantDetail(@JsonProperty("Invoice_Number") invoiceNum:Int,
+                                @JsonProperty("Merchant_Detail") merchant:Merchant,
+                                @JsonProperty("Location_Detail") location:Location)
+
+  case class SinkBillingDetail( @JsonProperty("Invoice_Number") invoiceNum:Int,
+                                @JsonProperty("MRCH_CD") MRCH_CD:Int,
+                                @JsonProperty("MRCH_CAT_CD") MRCH_CAT_CD:Int,
+                                @JsonProperty("MRCH_NM") MRCH_NM:String,
+                                @JsonProperty("BILL_AMT") BILL_AMT:Double)
+
+  case class SinkPurchasedProduct( @JsonProperty("Invoice_Number") invoiceNum:Int,
+                                   @JsonProperty("PRD_LIST") PRD_LIST:List[Product_Cart])
+
 }

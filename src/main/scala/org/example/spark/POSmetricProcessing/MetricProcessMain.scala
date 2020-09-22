@@ -7,12 +7,18 @@ import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.apache.hadoop.hbase.client.{HTable, Put}
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.spark.SparkConf
+import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.{ForeachWriter, Row, SparkSession}
 import org.example.spark.POSmetricProcessing.POJO.EntityMapper._
 import org.example.spark.POSmetricProcessing.hbaseUtils.hbaseOps._
+import org.apache.spark.sql.functions._
+import org.example.spark.POSmetricProcessing.sparkUdfUtils.MerchantBillingAggregator
+
 import scala.util.Try
+import org.example.spark.POSmetricProcessing.sparkUdfUtils.SparkUdfObject._
 
 case class offsetMarker(topic:String,partition:Int,offset:Long)
+case class billingKafka(topic:String,billing:SinkBillingDetail,partition:Int,offset:Long)
 
 
 object MetricProcessMain {
@@ -24,8 +30,9 @@ object MetricProcessMain {
     val spark = SparkSession.builder().master("local").config(new SparkConf()).getOrCreate()
 
 
-    /* Invoice Processing*/
-    val invoiceOffsetParam: Map[String, String] = scala.io.Source.fromInputStream(getClass.getResourceAsStream("/SparkKafkaConfig.cfg")).getLines().filter(line=>line.startsWith("invoice")).map(line=>line.split("#")(1)).map(line=>(line.split("=")(0),line.split("=")(1))).toMap
+
+    /* Invoice Processing Start*/
+    /*val invoiceOffsetParam: Map[String, String] = scala.io.Source.fromInputStream(getClass.getResourceAsStream("/SparkKafkaConfig.cfg")).getLines().filter(line=>line.startsWith("invoice")).map(line=>line.split("#")(1)).map(line=>(line.split("=")(0),line.split("=")(1))).toMap
     val invoice_subscribe_props = scala.io.Source.fromInputStream(getClass.getResourceAsStream("/SparkKafkaConfig.cfg")).getLines().filter(line=>(line.startsWith("init#") || line.startsWith("invoice#"))).map(line=>line.split("#")(1)).map(line=>(line.split("=")(0),line.split("=")(1))).toMap
 
     val sDf=spark.readStream.format("kafka").options(invoice_subscribe_props).option("startingOffsets", parseOffset(invoiceOffsetParam)).load()
@@ -75,7 +82,26 @@ object MetricProcessMain {
         }
       }
 
-    }).start().awaitTermination()
+    }).start().awaitTermination()*/
+
+    /* Invoice processing END */
+
+    /* Billing Processing*/
+    val billingOffsetParam: Map[String, String] = scala.io.Source.fromInputStream((this.asInstanceOf[Any]).getClass.getResourceAsStream("/SparkKafkaConfig.cfg")).getLines().filter(line=>line.startsWith("billing")).map(line=>line.split("#")(1)).map(line=>(line.split("=")(0),line.split("=")(1))).toMap
+    val billing_subscribe_props = scala.io.Source.fromInputStream((this.asInstanceOf[Any]).getClass.getResourceAsStream("/SparkKafkaConfig.cfg")).getLines().filter(line=>(line.startsWith("init#") || line.startsWith("billing#"))).map(line=>line.split("#")(1)).map(line=>(line.split("=")(0),line.split("=")(1))).toMap
+
+    import spark.implicits._
+    val catAgg = new MerchantBillingAggregator()
+
+    val billingDf=spark.readStream.format("kafka").options(billing_subscribe_props).option("startingOffsets", "earliest").load()
+      //.selectExpr("CAST(topic AS STRING)","CAST(value AS STRING)","CAST(partition AS INT)","CAST(offset AS LONG)","CAST(timestamp AS timestamp")
+      .select(col("topic").cast("string"),parseBill(col("value").cast("string")).as("value"),col("partition").cast("int"),col("offset").cast("long"),col("timestamp"))
+        .groupBy(window(col("timestamp"),"1 minute","1 minute"),col("value.MRCH_CAT_CD")).agg(catAgg(col("value")))
+
+    billingDf.printSchema()
+
+    billingDf.writeStream.outputMode("console").start().awaitTermination()
+
 
   }
 
