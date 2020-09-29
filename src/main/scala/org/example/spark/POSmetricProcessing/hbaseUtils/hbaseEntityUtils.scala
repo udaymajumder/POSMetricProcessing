@@ -37,7 +37,7 @@ object hbaseEntityUtils {
   def extractLocation(c:Location,field:String) = {
 
     field match {
-      case "LOC_ID" => {println(c.LOC_ID); c.LOC_ID}
+      case "LOC_ID" => c.LOC_ID
       case "LOC_NM" => c.LOC_NM
       case "LOC_PIN" => c.LOC_PIN
       case "LOC_STATE" => c.LOC_STATE
@@ -50,8 +50,20 @@ object hbaseEntityUtils {
   def extractProduct_Purchased(c:Product_Purchased,field:String) = {
 
     field match {
-      case "Product_Purchased" => if((c.PRD_LIST.isEmpty)) null else {println(c.PRD_LIST.mkString); c.PRD_LIST.mkString}
+      case "Product_Purchased" => if((c.PRD_LIST.isEmpty)) null else c.PRD_LIST.mkString
       case "BILL_AMT" => c.BILL_AMT
+
+    }
+
+  }
+
+  def extractMrchCatgBilling(c:HbaseMRCHCatgBilling,field:String) = {
+
+    field match {
+      case "WindowStartTime" => c.WindowStartTime
+      case "WindowEndTime"  => c.WindowEndTime
+      case "MRCH_CAT_CD" => c.MRCH_CAT_CD.toString
+      case "BILL_AMT" => c.BILL_AMT.toString
 
     }
 
@@ -79,16 +91,14 @@ object hbaseEntityUtils {
       .foreach(x=> {
         if(extractCustmer(customerDTL,x) == null) println("Skipping Value")
         else {
-          //println(extractCustmer(customerDTL,x))
           enrPut.addColumn(Bytes.toBytes("ConsumerDetail"),Bytes.toBytes(x),Bytes.toBytes(extractCustmer(customerDTL,x).toString))
         }
       })
 
     locationDTLAttrList.map(x=>x.toString.split('$')(1).split('.')(1))
-      .foreach(x=> { println(x)
+      .foreach(x=> {
         if(extractLocation(locationDTL,x) == null) println("Skipping Value")
         else {
-          //println(extractCustmer(customerDTL,x))
           enrPut.addColumn(Bytes.toBytes("LocationDetail"),Bytes.toBytes(x),Bytes.toBytes(extractLocation(locationDTL,x).toString))
         }
       })
@@ -99,14 +109,29 @@ object hbaseEntityUtils {
         else enrPut.addColumn(Bytes.toBytes("MerchantDetail"),Bytes.toBytes(x),Bytes.toBytes(extractMerchant(merchantDTL,x).toString))
       })
 
-    ppDTLAttrList.foreach(println)
     ppDTLAttrList.map(x=>x.toString.split(' ')(4).split('$')(1))
       .foreach(x=> {
-        println(x)
         if(extractProduct_Purchased(ppDTL,x) == null) println("Skipping Value")
         else enrPut.addColumn(Bytes.toBytes("productPurchasedDetail"),Bytes.toBytes(x),Bytes.toBytes(extractProduct_Purchased(ppDTL,x).toString))
       })
 
+    enrPut
+  }
+
+  def splitAndFetchBillingDtl(dSerValue:HbaseMRCHCatgBilling, put:Put) = {
+
+    val enrPut: Put =put
+    val billingDtl: HbaseMRCHCatgBilling = dSerValue
+
+    val billingDTLAttrList: List[Field] = billingDtl.getClass.getDeclaredFields.toList
+
+    billingDTLAttrList.map(x=>x.toString.split('$')(1).split('.')(1))
+      .foreach(x=> {
+        if(extractMrchCatgBilling(billingDtl,x) == null) println("Skipping Value")
+        else {
+          enrPut.addColumn(Bytes.toBytes("BillDetail"),Bytes.toBytes(x),Bytes.toBytes(extractMrchCatgBilling(billingDtl,x)))
+        }
+      })
     enrPut
   }
 

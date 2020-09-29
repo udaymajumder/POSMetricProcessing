@@ -55,31 +55,6 @@
             <version>2.9.10.4</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/io.circe/circe-core >
-        <dependency>
-            <groupId>io.circe</groupId>
-            <artifactId>circe-core_2.11</artifactId>
-            <version>0.11.1</version>
-        </dependency>
-
-
-        < https://mvnrepository.com/artifact/io.circe/circe-parser >
-        <dependency>
-            <groupId>io.circe</groupId>
-            <artifactId>circe-parser_2.11</artifactId>
-            <version>0.11.1</version>
-        </dependency>
-
-
-        < https://mvnrepository.com/artifact/io.circe/circe-generic >
-        <dependency>
-            <groupId>io.circe</groupId>
-            <artifactId>circe-generic_2.11</artifactId>
-            <version>0.11.1</version>
-        </dependency-->
-
-
-
         <!-- Apache Kafka Clients-->
         <dependency>
             <groupId>org.apache.kafka</groupId>
@@ -87,16 +62,12 @@
             <version>${kafka.version}</version>
         </dependency>
 
-
         <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
             <version>2.7.7</version>
         </dependency>
-
-
-
 
         <!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase-client -->
         <dependency>
@@ -133,7 +104,26 @@
             <version>2.3.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/net.alchim31.maven/scala-maven-plugin -->
+        <dependency>
+            <groupId>net.alchim31.maven</groupId>
+            <artifactId>scala-maven-plugin</artifactId>
+            <version>4.4.0</version>
+        </dependency>
 
+        <!-- Apache Log4J2 binding for SLF4J -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
+        <!--Apache commons-->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
 
 
 
@@ -145,19 +135,9 @@
         <sourceDirectory>src/main/scala</sourceDirectory>
         <testSourceDirectory>src/test/scala</testSourceDirectory>
 
+
+
         <plugins>
-
-            <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>scala-maven-plugin</artifactId>
-                <version>4.4.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
-            </plugin>
-
             <!-- This plugin compiles Scala files -->
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
@@ -179,6 +159,17 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Maven Compiler Plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
 
         </plugins>

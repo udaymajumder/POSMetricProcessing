@@ -28,7 +28,6 @@ object hbaseOps {
   def loadcolMapping() = {
     if (tblCFmapping.isEmpty) {
       scala.io.Source.fromInputStream(getClass.getResourceAsStream("/tblColFamily.cfg")).getLines().map(line => line.split(":")(1)).foreach(line => {
-        println(line);
         tblCFmapping += (line.split("=")(0) -> line.split("=")(1))
       })
     }

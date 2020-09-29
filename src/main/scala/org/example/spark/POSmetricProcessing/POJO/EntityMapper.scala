@@ -1,6 +1,7 @@
 package org.example.spark.POSmetricProcessing.POJO
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.apache.spark.sql.execution.streaming.FileStreamSource.Timestamp
 
 object EntityMapper {
 
@@ -66,5 +67,11 @@ object EntityMapper {
 
   case class SinkPurchasedProduct( @JsonProperty("Invoice_Number") invoiceNum:Int,
                                    @JsonProperty("PRD_LIST") PRD_LIST:List[Product_Cart])
+
+  /* HBase Specific classes */
+  case class HbaseMRCHCatgBilling(WindowStartTime:String,WindowEndTime:String,MRCH_CAT_CD:Int,BILL_AMT:Double)
+
+  /*Kafka Specific Classes*/
+  case class offsetMarker(topic:String,partition:Int,offset:Long)
 
 }
